@@ -1,4 +1,4 @@
--- Active: 1681752979645@@127.0.0.1@3306
+-- Active: 1681827729295@@127.0.0.1@3306
 
 CREATE TABLE
     films (
@@ -8,110 +8,112 @@ CREATE TABLE
         created_at TEXT DEFAULT (DATETIME()) NOT NULL
     );
 
-DROP TABLE users;
+DROP TABLE films;
+DROP TABLE tasks;
+DROP TABLE users_tasks;
 
--- CREATE TABLE
+CREATE TABLE
 
---     tasks (
+    tasks (
 
---         id TEXT PRIMARY KEY UNIQUE NOT NULL,
+        id TEXT PRIMARY KEY UNIQUE NOT NULL,
 
---         title TEXT NOT NULL,
+        title TEXT NOT NULL,
 
---         description TEXT NOT NULL,
+        description TEXT NOT NULL,
 
---         created_at TEXT DEFAULT (DATETIME()) NOT NULL,
+        created_at TEXT DEFAULT (DATETIME()) NOT NULL,
 
---         status INTEGER DEFAULT (0) NOT NULL
+        status INTEGER DEFAULT (0) NOT NULL
 
---     );
+    );
 
--- CREATE TABLE
+CREATE TABLE
 
---     users_tasks (
+    users_tasks (
 
---         user_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
 
---         task_id TEXT NOT NULL,
+        task_id TEXT NOT NULL,
 
---         FOREIGN KEY (user_id) REFERENCES users (id),
+        FOREIGN KEY (user_id) REFERENCES users (id),
 
---         FOREIGN KEY (task_id) REFERENCES tasks (id)
+        FOREIGN KEY (task_id) REFERENCES tasks (id)
 
---     );
+    );
 
--- INSERT INTO
+INSERT INTO
 
---     users (id, name, email, password)
+    users (id, name, email, password)
 
--- VALUES (
+VALUES (
 
---         "f001",
+        "f001",
 
---         "Fulano",
+        "Fulano",
 
---         "fulano@email.com",
+        "fulano@email.com",
 
---         "fulano123"
+        "fulano123"
 
---     ), (
+    ), (
 
---         "f002",
+        "f002",
 
---         "Beltrana",
+        "Beltrana",
 
---         "beltrana@email.com",
+        "beltrana@email.com",
 
---         "beltrana00"
+        "beltrana00"
 
---     );
+    );
 
--- INSERT INTO
+INSERT INTO
 
---     tasks (id, title, description)
+    tasks (id, title, description)
 
--- VALUES (
+VALUES (
 
---         "t001",
+        "t001",
 
---         "Implementar o header",
+        "Implementar o header",
 
---         "Criar o componente Header do site"
+        "Criar o componente Header do site"
 
---     ), (
+    ), (
 
---         "t002",
+        "t002",
 
---         "Implementar o footer",
+        "Implementar o footer",
 
---         "Criar o componente Footer do site"
+        "Criar o componente Footer do site"
 
---     ), (
+    ), (
 
---         "t003",
+        "t003",
 
---         "Testar site",
+        "Testar site",
 
---         "Teste de usabilidade de todo o site"
+        "Teste de usabilidade de todo o site"
 
---     ), (
+    ), (
 
---         "t004",
+        "t004",
 
---         "Deploy do site",
+        "Deploy do site",
 
---         "Subir o site no surge"
+        "Subir o site no surge"
 
---     );
+    );
 
--- INSERT INTO
+INSERT INTO
 
---     users_tasks (user_id, task_id)
+    users_tasks (user_id, task_id)
 
--- VALUES ("f001", "t001"), ("f002", "t002"), ("f001", "t003"), ("f002", "t003");
+VALUES ("f001", "t001"), ("f002", "t002"), ("f001", "t003"), ("f002", "t003");
 
--- SELECT * FROM users;
+SELECT * FROM users;
 
--- SELECT * FROM tasks;
+SELECT * FROM tasks;
 
--- SELECT * FROM users_tasks;
+SELECT * FROM users_tasks;

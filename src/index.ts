@@ -1,8 +1,9 @@
 import express, { Request, Response } from 'express'
 import cors from 'cors'
 import { TfilmeDB } from './types'
-import { db } from './database/knex'
+// import { db } from './database/Basedatabase'
 import { Film } from './database/models/filme'
+import { FilmDatabase } from './database/FilmDatabase'
 
 const app = express()
 
@@ -13,29 +14,32 @@ app.listen(3003, () => {
     console.log(`Servidor rodando na porta ${3003}`)
 })
 
-app.get("/ping", async (req: Request, res: Response) => {
-    try {
-        res.status(200).send({ message: "Pong!" })
-    } catch (error) {
-        console.log(error)
+// app.get("/ping", async (req: Request, res: Response) => {
+//     try {
+//         res.status(200).send({ message: "Pong!" })
+//     } catch (error) {
+//         console.log(error)
 
-        if (req.statusCode === 200) {
-            res.status(500)
-        }
+//         if (req.statusCode === 200) {
+//             res.status(500)
+//         }
 
-        if (error instanceof Error) {
-            res.send(error.message)
-        } else {
-            res.send("Erro inesperado")
-        }
-    }
-})
+//         if (error instanceof Error) {
+//             res.send(error.message)
+//         } else {
+//             res.send("Erro inesperado")
+//         }
+//     }
+// })
 
 app.get("/filmes", async(req:Request, res:Response) =>{
     try {
-        let filmsDB
-        const result: TfilmeDB[] = await db("films")
-        filmsDB = result
+
+        const q = req.query.q as string | undefined
+
+        const filmDataBase = new FilmDatabase()
+
+        const filmsDB = await filmDataBase.findFilms(q)
 
         const films:Film[] = filmsDB.map((filmDB) =>new Film(
             filmDB.id,
@@ -79,30 +83,32 @@ app.post("/filmes", async(req:Request, res:Response) =>{
             throw new Error("'duration' deve ser number")
         }
 
-        const [ filmDBExists ]: TfilmeDB[] | undefined[] = await db("films").where({ id })
+        const filmDatabase = new FilmDatabase()
 
-        if (filmDBExists) {
+        const [usersDB] = await filmDatabase.findfilmById(id)
+        
+        if (usersDB) {
             res.status(400)
             throw new Error("'id' já existe")
         }
-
+        
         const newFilm = new Film(
             id,
             title,
             duration,
             new Date().toISOString()
-        )
+            )
+            
+            const newFilmDb: TfilmeDB = {
+                id: newFilm.getId(),
+                title: newFilm.getTitle(),
+                duration: newFilm.getDuration(),
+                created_at: newFilm.getCreatedAt()
+            }
+            
+        await filmDatabase.insertFilm(newFilmDb)
 
-        const newFilmDb: TfilmeDB = {
-            id: newFilm.getId(),
-            title: newFilm.getTitle(),
-            duration: newFilm.getDuration(),
-            created_at: newFilm.getCreatedAt()
-        }
-
-        await db("films").insert(newFilmDb)
-        const [ filmDB ]: TfilmeDB[] = await db("films").where({ id })
-        res.status(201).send(filmDB)
+        res.status(201).send("Filme adicionado com sucesso!")
 
     } catch (error) {
         console.log(error)
@@ -122,13 +128,18 @@ app.post("/filmes", async(req:Request, res:Response) =>{
 app.put("/filmes/:id", async(req:Request, res:Response) =>{
     try {
 
+
         // const {id} = req.params 
 
         const idrecebido = req.params.id as string
 
         if(idrecebido !== undefined){
-            const [ filmDBExists ]: TfilmeDB[] | undefined[] = await db("films").where({id: idrecebido })
-            if(filmDBExists){
+        
+        const filmDataBase = new FilmDatabase()
+
+        const [filmsDB] = await filmDataBase.findfilmById(idrecebido)
+            
+            if(filmsDB){
                 const newId = req.body.id as string|  undefined
                 const newTitle = req.body.title as string|  undefined
                 const newDuration = req.body.duration as number|  undefined
@@ -153,11 +164,15 @@ app.put("/filmes/:id", async(req:Request, res:Response) =>{
                     created_at: newFilm.getCreatedAt()
                 }
                 
-                await db("films").update(newFilmDb).where({id: idrecebido})
+                await filmDataBase.editFilm(newFilmDb, idrecebido)
                 res.status(200).send("Usuário editado com sucesso!!")
 
                 }
 
+            }
+            else{
+                res.status(400)
+                throw new Error("Id não encontrado!")
             }
         }
         else{
@@ -181,12 +196,17 @@ app.put("/filmes/:id", async(req:Request, res:Response) =>{
 app.delete("/filmes/:id", async(req:Request, res:Response) =>{
     try {
         // const idrecebido = req.params.id as string
+
         const {id} = req.params
         
         if(id !== undefined){
-            const  [filmDBExists] : TfilmeDB[] | undefined[] = await db("films").where({id})
-            if(filmDBExists){
-                await db("films").del().where({id})
+            const filmDataBase = new FilmDatabase()
+
+            const filmsDB = await filmDataBase.findfilmById(id)
+
+            if(filmsDB){
+
+                await filmDataBase.deleteFilm(id)
                 res.status(200).send("Filme apagado com sucesso!!")
             }
             else{
