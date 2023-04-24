@@ -1,4 +1,4 @@
--- Active: 1681827729295@@127.0.0.1@3306
+-- Active: 1682340027752@@127.0.0.1@3306
 
 CREATE TABLE
     films (
@@ -11,6 +11,8 @@ CREATE TABLE
 DROP TABLE films;
 DROP TABLE tasks;
 DROP TABLE users_tasks;
+
+SELECT * FROM films;
 
 CREATE TABLE
 

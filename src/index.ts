@@ -37,6 +37,8 @@ const filmsController = new FilmsController
 
 app.get("/filmes", filmsController.getAllMovies)
 
+app.get("/filmes/:id", filmsController.getMoviebyId)
+
 app.post("/filmes", filmsController.addNewMovie)
 
 app.put("/filmes/:id", filmsController.editanMovie)

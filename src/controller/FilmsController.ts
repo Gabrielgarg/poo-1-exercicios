@@ -2,26 +2,62 @@ import { Request, Response } from "express"
 import { FilmDatabase } from "../database/FilmDatabase"
 import { Film } from "../database/models/filme"
 import { TfilmeDB } from "../types"
+import { FilmsBusiness } from "../business/FilmsBusiness"
 
 
 export class FilmsController{
     getAllMovies =  async(req:Request, res:Response) =>{
         try {
     
-            const q = req.query.q as string | undefined
+            // const q = req.query.q as string | undefined
+
+            // const input ={
+            //     q: req.query.q
+            // }
+
+            const filmbusiness = new FilmsBusiness()
+            const output = await filmbusiness.getAllMovies()
     
-            const filmDataBase = new FilmDatabase()
+            // const filmDataBase = new FilmDatabase()
     
-            const filmsDB = await filmDataBase.findFilms(q)
+            // const filmsDB = await filmDataBase.findFilms(q)
     
-            const films:Film[] = filmsDB.map((filmDB) =>new Film(
-                filmDB.id,
-                filmDB.title,
-                filmDB.duration,
-                filmDB.created_at
-            ))
+            // const films:Film[] = filmsDB.map((filmDB) =>new Film(
+            //     filmDB.id,
+            //     filmDB.title,
+            //     filmDB.duration,
+            //     filmDB.created_at
+            // ))
     
-            res.status(200).send(films)
+            res.status(200).send(output)
+        } catch (error) {
+            console.log(error)
+    
+            if (req.statusCode === 200) {
+                res.status(500)
+            }
+    
+            if (error instanceof Error) {
+                res.send(error.message)
+            } else {
+                res.send("Erro inesperado")
+            }
+        }
+    }
+
+    getMoviebyId = async(req:Request, res:Response) =>{
+        try {
+                
+            const input ={
+                id: req.params.id
+            }
+
+            const filmBusiness = new FilmsBusiness()
+            const output = await filmBusiness.getMovieByid(input)
+
+    
+            res.status(201).send(output)
+            
         } catch (error) {
             console.log(error)
     
@@ -39,49 +75,19 @@ export class FilmsController{
 
     addNewMovie = async(req:Request, res:Response) =>{
         try {
-            const { id, title, duration } = req.body
+            // const { id, title, duration } = req.body
     
-            if (typeof id !== "string") {
-                res.status(400)
-                throw new Error("'id' deve ser string")
+            const input ={
+                id: req.body.id,
+                title: req.body.title,
+                duration: req.body.duration
             }
+
+            const filmBusiness = new FilmsBusiness()
+            const output = await filmBusiness.addNewMovie(input)
+
     
-            if (typeof title !== "string") {
-                res.status(400)
-                throw new Error("'titulo' deve ser string")
-            }
-    
-            if (typeof duration !== "number") {
-                res.status(400)
-                throw new Error("'duration' deve ser number")
-            }
-    
-            const filmDatabase = new FilmDatabase()
-    
-            const [usersDB] = await filmDatabase.findfilmById(id)
-            
-            if (usersDB) {
-                res.status(400)
-                throw new Error("'id' já existe")
-            }
-            
-            const newFilm = new Film(
-                id,
-                title,
-                duration,
-                new Date().toISOString()
-                )
-                
-                const newFilmDb: TfilmeDB = {
-                    id: newFilm.getId(),
-                    title: newFilm.getTitle(),
-                    duration: newFilm.getDuration(),
-                    created_at: newFilm.getCreatedAt()
-                }
-                
-            await filmDatabase.insertFilm(newFilmDb)
-    
-            res.status(201).send("Filme adicionado com sucesso!")
+            res.status(201).send(output)
     
         } catch (error) {
             console.log(error)
